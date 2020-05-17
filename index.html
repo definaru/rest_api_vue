@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Пример API</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://glyphsearch.com/bower_components/ionicons/css/ionicons.css">
+    </head>
+    <body>
+        
+        <div id="test" class="mt-5 mb-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <template v-if="userId"><h2>{{ users.username }}</h2></template>
+                        <template v-else><h2>{{ header }}</h2></template>
+                    </div>
+                    <template v-if="userId"></template>
+                    <template v-else>
+                        <div class="col-md-3">
+                            <input type="number" min="1" class="form-control" v-on:change.down.up="fetchResource(limit)" v-model="limit">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" v-model="selected">
+                                <option v-for="section in sections" v-bind:value="section.value">{{ section.text }}</option>
+                            </select>
+                        </div>                        
+                    </template>
+                </div>
+                <div class="row">
+                    <div class="col-md-12"><hr/></div>
+                </div>
+                <template v-if="users == ''">
+                    <button class="btn" disabled>
+                        <span class="spinner-border spinner-border-sm"></span>
+                        Loading..
+                    </button>
+                </template>
+                <template v-else>
+                <div class="row">
+                    <template v-if="users.id">
+                        <div class="col-md-12">
+                            <div class="media">
+                                <img src="https://www.w3schools.com/bootstrap4/img_avatar3.png" :alt="users.name" class="mr-3 rounded-circle" style="width:60px;">
+                                <div class="media-body">
+                                    <h5 class="pt-2 m-0">{{ users.name }}</h5>
+                                    <small class="text-muted">
+                                        <i class="ionicons ion-email" style="font-size: 21px;bottom: -4px;position: relative;margin-right: 3px;"></i> 
+                                        {{ users.email }}
+                                    </small>                                    
+                                </div>
+                            </div>
+                            <div class="jumbotron pt-4 pb-4 mt-3">
+                                <label class="font-weight-bold">Address:</label>
+                                <p><i class="ionicons ion-android-pin"></i> {{ users.address.zipcode + ', ' + users.address.suite + ' ' + users.address.city + ' ' + users.address.street }}</p>
+                                <a :href="`tel:${users.phone}`" class="btn-block"><i class="ionicons ion-android-call text-dark"></i> {{ users.phone }}</a>
+                                <a :href="`http://${users.website}`" class="btn-block m-0"><i class="ionicons ion-link text-dark"></i> {{ users.website }}</a>
+                                <label class="font-weight-bold mt-5">Company:</label>
+                                <p>{{ users.company.name }}</p>
+                                <p>{{ users.company.catchPhrase }}</p>
+                                <p>{{ users.company.bs }}</p>
+                                <a href="javascript:history.back(1)" class="btn btn-sm btn-dark"> вернуться назад</a>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                    <div :class="selected" v-for="user in users" :key="user.id">
+                        <template v-if="(selected == 'col-md-12' || selected == 'col-md-6')">
+                        <div class="media border p-3 mb-3">
+                            <img src="https://www.w3schools.com/bootstrap4/img_avatar3.png" :alt="user.name" class="mr-3 rounded-circle" style="width:60px;">
+                            <div class="media-body">
+                                <h5>
+                                    <a :href="`?id=${user.id}`">{{ user.username }} {{ user.name }}</a> <br/>
+                                    <small><i class="text-muted">{{ user.email }}</i></small>
+                                </h5>
+                                <p class="m-0"><i class="ionicons ion-android-pin"></i>
+                                    {{ user.address.zipcode }}
+                                    {{ user.address.suite }}
+                                    {{ user.address.city }}
+                                    {{ user.address.street }}
+                                </p>      
+                                <a :href="`tel:${user.phone}`" class="btn-block"><i class="ionicons ion-android-call text-dark"></i> {{ user.phone }}</a>
+                                <a :href="`http://${user.website}`" class="btn-block m-0"><i class="ionicons ion-link text-dark"></i> {{ user.website }}</a>
+                            </div>
+                        </div> 
+                        </template>
+                        <template v-else>
+                            <div class="card shadow-sm mb-4">
+                                <img class="card-img-top" src="https://www.w3schools.com/bootstrap4/img_avatar3.png" :alt="user.name" style="width:100%">
+                                <div class="card-body">
+                                    <h4 class="m-0 card-title"><a :href="`?id=${user.id}`">{{ user.name }}</a></h4>
+                                    <p class="card-text"><small class="text-muted">{{ user.email }}</small></p>
+                                    <div style="height: 50px">
+                                        <small class="m-0"><i class="ionicons ion-android-pin"></i>
+                                            {{ user.address.zipcode }} 
+                                            {{ user.address.suite }},
+                                            {{ user.address.city }},
+                                            {{ user.address.street }}
+                                        </small>                                          
+                                    </div>
+
+                                    <a :href="`tel:${user.phone}`" class="btn-block"><i class="ionicons ion-android-call text-dark"></i> {{ user.phone }}</a>
+                                    <a :href="`http://${user.website}`" class="btn-block m-0"><i class="ionicons ion-link text-dark"></i> {{ user.website }}</a>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    </template>
+                    
+                </div>
+                </template>
+
+
+            </div>
+        </div>
+       
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+       <script>
+            const params = window
+                .location
+                .search
+                .replace('?','')
+                .split('&')
+                .reduce(
+                    function(p,e){
+                        var a = e.split('=');
+                        p[ decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
+                        return p;
+                    },
+                    {}
+                );
+            const app = new Vue({
+                el: '#test',
+                data() {
+                    return {
+                        header: 'Список пользователей',
+                        userId: (window.location.search == '') ? '' : params['id'],
+                        selected: 'col-md-12',
+                        limit: 4,
+                        sections: [
+                            { value: 'col-md-12', text: 'Список' },
+                            { value: 'col-md-6', text: 'В две колонки' },
+                            { value: 'col-md-4', text: 'В три колонки' },
+                            { value: 'col-md-3', text: 'В четыре колонки' }
+                        ],
+                        users: []
+                    };
+                },
+                mounted() {
+                    this.fetchResource(this.limit)
+                },
+                methods: {
+                    async fetchResource(limit) {
+                        const url = (window.location.search == '') ? 'https://jsonplaceholder.typicode.com/users?_limit='+limit : 'https://jsonplaceholder.typicode.com/users/'+params['id']
+                        const response = await fetch(url)
+                        const users = await response.json()
+                        this.users = users
+                    }
+                }
+            });
+       </script>
+    </body>
+</html>
