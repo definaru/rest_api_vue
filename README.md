@@ -1,2 +1,4 @@
-# rest_api_vue
+# Rest API Vue JS
+---
+
 Getting data by API
