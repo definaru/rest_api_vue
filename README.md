@@ -1,4 +1,5 @@
-# Rest API Vue JS ![GPL_3](https://definaru.github.io/assets/images/180px-GPL_v3_Blue_Badge.svg.png)
+![GPL_3](https://definaru.github.io/assets/images/180px-GPL_v3_Blue_Badge.svg.png)
+# Rest API Vue JS 
 
 Getting data by API
 
