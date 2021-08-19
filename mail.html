@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+    <title>Почта</title>
+	<link rel="shortcut icon" href="https://crm-defina.com/img/favicon.png">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://glyphsearch.com/bower_components/foundation-icon-fonts/foundation-icons.css">
+    <link rel="stylesheet" href="https://glyphsearch.com/bower_components/ionicons/css/ionicons.css">
+    <style>
+        .cp {cursor:pointer;}
+        .dropdown-toggle::after {display: none;}
+        .btn.focus, .btn:focus {
+            outline: 0;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="apps">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 p-0">
+  <div class="input-group d-print-none">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fi-magnifying-glass"></i></span>
+    </div>
+    <input type="search" class="form-control" placeholder="Поиск писем" v-model="searth">
+  </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 p-0 d-print-none">
+                    <table class="table table-hover">
+                        <tr v-for="n in filtredMail" :key="n.id" class="cp" :class="{'table-active': selectMailCell === n.id}">
+                            <td>
+                                <input class="form-check-input ml-1" type="checkbox">
+                            </td>
+                            <td @click="selectMail(n.id), inbox = false, n.read = true">
+                                <small :class="{'font-weight-bold': !n.read}">{{ n.text }}</small>
+                            </td>
+                            <td @click="selectMail(n.id), inbox = false"><small class="text-muted float-right">{{ n.date }}</small></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-8 p-0">
+                    <div class="border" style="height: 100vh !important;">
+                        
+                        
+                        <template v-if="inbox">
+                            <div class="p-3" v-if="mail">
+                                <form>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white text-left">
+                                                <small class="text-white badge badge-secondary">От кого:</small>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control border-left-0" placeholder="Адрес отправителя" value="info@defina.ru">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white text-left">
+                                                <small class="text-white badge badge-secondary">Кому:</small>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control border-left-0" placeholder="Адрес получателя" :value="mail.email">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white text-left">
+                                                <small class="text-white badge badge-secondary">Тема:</small>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control border-left-0" placeholder="Тема письма">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <textarea class="form-control" rows="6">Здравствуйте, {{ mail.name }}</textarea>
+                                    </div>
+
+                                    <div class="d-flex align-items-center">
+                                        <button type="button" class="btn btn-warning"><i class="ionicons ion-android-share"></i> Отправить</button>
+                                        <button @click="inbox = false" class="btn btn-outline-danger ml-2">
+                                            <i class="fi-x"></i> Отмена
+                                        </button>
+                                        <label class="btn btn-outline-light text-dark ml-2 mb-0">
+                                            <i class="ionicons ion-paperclip"></i>
+                                            <input type="file" name="file" class="d-none" />
+                                        </label>                                        
+                                    </div>
+
+                                </form>
+                            </div>
+                        </template>
+                        
+                        <template v-else>
+                            <template v-if="mail.id">
+                            <div class="btn-group btn-group-lg float-right">
+                                <button type="button" class="btn btn-default" @click="clickBtnStar" v-html="iconStarNow"></button>
+                                <button type="button" class="btn btn-default" @click="inbox = true"><i class="ionicons ion-android-share"></i></button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                        <i class="ionicons ion-android-more-vertical" style="font-size: 25px;margin-top: 6px;"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">Tablet</a>
+                                        <a class="dropdown-item" href="#">Smartphone</a>
+                                    </div>
+                                </div>
+                            </div>  
+                            
+                            <h6 class="pt-3 pl-3 pr-3 pb-0">{{ mail.text }} 
+                                &#160; <i class="fi-mail text-primary"></i> &#160; 
+                                <span class="badge badge-light">Входящие <i class="ionicons ion-android-close"></i></span>
+                            </h6>
+
+                            <div class="media pt-3 pl-3 pr-3 pb-0">
+                                <img :src="mail.avatar" :alt="mail.name" class="mr-3 mt-0 rounded-circle" style="width:60px;">
+                                <div class="media-body">
+                                    <h4>{{ mail.name }} <small><{{ mail.email }}></small> &#160; <i class="fi-print cp" onclick="window.print()"></i> &#160; <i class="ionicons ion-android-open"></i></h4>
+                                    <small class="text-muted"><i class="fi-clock"></i> <i>{{ mail.date }}</i></small>
+                                </div>
+                            </div>
+                            <div class="d-block btn-block p-3">
+                                <hr/>
+                                <span v-html="mail.message"></span>
+                                <hr/>
+                                <button @click="inbox = true" class="btn btn-outline-light text-dark">
+                                    <i class="ionicons ion-android-share"></i> ответить
+                                </button>
+                                <button class="btn btn-outline-light text-dark">
+                                    <i class="fi-arrow-right"></i> переслать
+                                </button>
+                            </div> 
+							</template>	
+						<template v-else>
+							<div class="p-3 text-center"> 
+								<div class="d-flex flex-column">
+									<div class="p-2"><i class="fi-mail text-primary" style="font-size: 150px;opacity: 0.1;"></i></div>
+									<div class="p-2"><strong>Выберите сообщение из списка</strong></div>
+								</div>
+							</div>
+						</template>
+                        
+						</template>
+						
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script>
+
+        
+        new Vue({
+            el: '#apps',
+            data: {
+                mails: [],
+                mail: null,
+                selectMailCell: null,
+                inbox: false,
+                isActive: false,
+                searth: ''
+            },
+            methods: {
+                clickBtnStar() {
+                    
+                    var id = this.mail.id;
+                    this.mails = this.mails.map(function(mail)  {
+                        if(mail.id === id) {
+                            mail.favorite = !mail.favorite;
+                        }
+                        return mail;
+                    });
+                    this.$set(this.mail, 'favorite', this.mail.favorite);
+
+                },
+                selectMail(id) {
+                    this.mails = this.mails.map(function(mail)  {
+                        if(mail.id === id) {
+                            mail.read = true;
+                        }
+                        return mail;
+                    });
+                    this.$set(this.mail, 'read', true); 
+                    
+                    this.mail = this.mails.find(mail => {return mail.id === id});
+                    this.selectMailCell = id;
+                    this.isActive = id
+                }
+            },
+            computed: {
+                iconStarNow() {
+                    return this.mail.favorite ? '<i class="ionicons ion-android-star text-warning"></i>' : '<i class="ionicons ion-android-star-outline"></i>';
+                },
+                filtredMail() {
+                    return this.mails.filter(mail => {
+                        var result = this.searth ? mail.email.indexOf(this.searth) > -1 : this.mails;
+                        return result;
+                    });
+                }
+            },
+            mounted() {
+                this.mails = [
+                    {
+                        id: 1,
+                        email: 'java@gmail.com', 
+                        avatar: 'https://www.w3schools.com/bootstrap4/img_avatar1.png', 
+                        name: 'Java Script', 
+                        text: 'Изучить этот JavaScript', 
+                        message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 
+                        favorite: false,
+                        read: false,
+                        date: '22.09.2018 в 11: 00'
+                    },                    
+                    {
+                        id: 2,
+                        email: 'vue@gmail.com', 
+                        avatar: 'https://www.w3schools.com/bootstrap4/img_avatar2.png', 
+                        name: 'Vue JS', 
+                        text: 'Изучить Vue', 
+                        message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 
+                        favorite: false,
+                        read: false,
+                        date: '22.09.2018 в 11: 00'  
+                    },                    
+                    {
+                        id: 3,
+                        email: 'music@yandex.ru', 
+                        avatar: 'https://www.w3schools.com/bootstrap4/img_avatar3.png', 
+                        name: 'Classic Music', 
+                        text: 'Создать что-нибудь классное', 
+                        message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 
+                        favorite: false,
+                        read: false,
+                        date: '22.09.2018 в 11: 00'
+                    },
+                    {
+                        id: 4,
+                        email: 'emily@yandex.ru',
+                        avatar: 'https://www.w3schools.com/bootstrap4/img_avatar4.png',
+                        name: 'Эмили Стоун',
+                        text: 'Новое сообщение от Эмили',
+                        message: '<b>Consectetur adipiscing elit</b>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br/>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?',
+                        favorite: false,
+                        read: false,
+                        date: '22.12.2019 в 21:07'
+                    },
+                    {
+                        id: 5,
+                        email: 'lloy-iver@yandex.ru',
+                        avatar: 'https://www.w3schools.com/bootstrap4/img_avatar4.png',
+                        name: 'Кристин Ллоу', 
+                        text: 'Новое сообщение от Кристин',
+                        message: '<b>Consectetur adipiscing elit</b>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                        favorite: false,
+                        read: false,
+                        date: '23.12.2020 в 20:00'
+                    }
+                ];
+                this.mail = this.mails;
+            }
+        });
+    </script>
+</body>
+</html>
